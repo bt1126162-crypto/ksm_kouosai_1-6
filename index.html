@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>文化祭ミッション</title>
+<style>
+  /* 基本デザイン */
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    touch-action: manipulation; /* ダブルタップズーム防止 */
+  }
+  
+  /* 画面上部に固定されるタイマー（ページ3、4で使用） */
+  #timer-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 1000;
+    letter-spacing: 2px;
+  }
+
+  /* ページの表示切り替え用クラス */
+  .page {
+    display: none;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    padding-top: 70px; /* 上部タイマーに隠れないようにするための余白 */
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff;
+  }
+  /* ページが表示状態のとき */
+  .page.active {
+    display: flex;
+  }
+  
+  /* タイマーが出ないページは中央寄せに調整 */
+  #page1, #page2, #page5, #page6 {
+    justify-content: center;
+    padding-top: 20px;
+  }
+
+  /* UIパーツのデザイン */
+  h1 { font-size: 22px; text-align: center; margin-bottom: 20px; }
+  
+  .btn {
+    display: block;
+    width: 85%;
+    max-width: 320px;
+    padding: 15px;
+    margin: 20px auto;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .btn:disabled {
+    background-color: #ccc;
+    box-shadow: none;
+    color: #666;
+  }
+  
+  .form-group {
+    width: 100%;
+    max-width: 300px;
+    margin: 15px 0;
+  }
+  label { font-weight: bold; display: block; margin-bottom: 8px; }
+  select, input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .radio-group {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+  }
+  .radio-group label { font-weight: normal; font-size: 18px; display: flex; align-items: center; gap: 5px;}
+
+  /* はんこ風のMISSIONテキスト */
+  .stamp {
+    color: #D32F2F;
+    border: 4px solid #D32F2F;
+    border-radius: 8px;
+    padding: 10px 25px;
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    transform: rotate(-5deg);
+    display: inline-block;
+    margin-bottom: 30px;
+    font-family: 'Times New Roman', serif; /* 明朝体っぽくしてスタンプ感を出す */
+  }
+
+  /* 問題文エリア */
+  .question-box {
+    background: #f9f9f9;
+    border-left: 5px solid #007BFF;
+    padding: 15px;
+    width: 100%;
+    max-width: 350px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  /* 3桁の回答入力エリア */
+  .answer-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  .answer-inputs select {
+    width: 65px;
+    height: 55px;
+    font-size: 24px;
+    text-align: center;
+    padding: 0;
+  }
+  
+  /* ヒント表示 */
+  #hint-text {
+    display: none;
+    color: #E65100;
+    font-weight: bold;
+    background: #FFF3E0;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+  }
+
+  /* ページ4の六角形マーク */
+  .hexagon {
+    width: 120px;
+    height: 138px;
+    background-color: #FFC107;
+    /* CSSで正六角形を描画 */
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    margin: 30px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+  }
+
+  /* ページ5の赤い透明フィルター */
+  #red-filter {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255, 0, 0, 0.3);
+    pointer-events: none; /* フィルター越しにスクロールできるようにする */
+    z-index: 9999;
+  }
+  
+  .mission-failed {
+    color: #D32F2F;
+    font-size: 38px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  /* 解説エリア */
+  .explanation-box {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 15px;
+    width: 100%;
+    max-width: 350px;
+    margin-top: 20px;
+    line-height: 1.6;
+    font-size: 14px;
+    text-align: left;
+    border-radius: 5px;
+  }
+
+  /* ページ6 クリア画面 */
+  .clear-text {
+    color: #388E3C;
+    font-size: 44px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+</style>
+</head>
+<body>
+
+<div id="timer-container">
+  <span id="timer-display">00:00:00</span>
+</div>
+
+<div id="red-filter"></div>
+
+
+<div id="page1" class="page active">
+  <h1>プレイヤー設定</h1>
+  
+  <div class="form-group">
+    <label for="age">年齢</label>
+    <select id="age"></select>
+  </div>
+  
+  <div class="form-group">
+    <label>難易度選択</label>
+    <div class="radio-group">
+      <label><input type="radio" name="difficulty" value="easy" checked> Easy</label>
+      <label><input type="radio" name="difficulty" value="hard"> Hard</label>
+    </div>
+  </div>
+  
+  <button class="btn" onclick="goToPage2()">上の内容で確定</button>
+</div>
+
+
+<div id="page2" class="page">
+  <button class="btn" style="font-size: 26px; padding: 25px;" onclick="startGame()">GAME START</button>
+</div>
+
+
+<div id="page3" class="page">
+  <div class="stamp">MISSION</div>
+  
+  <div class="question-box" id="q-easy">
+    <p>以下の法則で、3つの数字のグループが別の数字に変身しています。</p>
+    <p>
+      1 3 7 ＝ 0<br>
+      6 1 2 ＝ 1<br>
+      9 0 8 ＝ 4<br>
+      8 8 6 ＝ 5
+    </p>
+    <p>では、次のA、B、Cを解いて、出た数字を左から順番に並べた「3桁の数字」を並べて暗証番号を解読せよ。</p>
+    <p>
+      A： 8 0 6 ＝ ？<br>
+      B： 5 9 0 ＝ ？<br>
+      C： 8 8 8 ＝ ？
+    </p>
+  </div>
+  
+  <div class="question-box" id="q-hard" style="display:none;">
+    <p>以下の法則で和風月名（旧暦の月）が数字に変換されています。</p>
+    <p>
+      睦月 ＝ 7<br>
+      如月 ＝ 8<br>
+      弥生 ＝ 5<br>
+      卯月 ＝ 5
+    </p>
+    <p>では、この法則に従い、以下の3つの月が表す「3桁の数字」をもとに暗証番号を導け？</p>
+    <p>「 長月 ・ 皐月 ・ 師走 」 ＝ ？？？</p>
+  </div>
+
+  <button class="btn" id="hint-btn" onclick="showHint()" disabled>ヒント（時間が来ると押せます）</button>
+  <div id="hint-text"></div>
+  
+  <div class="answer-inputs">
+    <select id="ans1"></select>
+    <select id="ans2"></select>
+    <select id="ans3"></select>
+  </div>
+  
+  <button class="btn" onclick="checkAnswer()">解答する</button>
+</div>
+
+
+<div id="page4" class="page">
+  <div class="hexagon">★</div>
+  
+  <div class="form-group" style="margin-top: 20px;">
+    <input type="text" id="final-keyword" placeholder="宝を持ち帰りスタッフにスマホを見せよう">
+  </div>
+  
+  <button class="btn" onclick="checkFinal()">送信</button>
+</div>
+
+
+<div id="page5" class="page">
+  <div class="mission-failed">MISSION失敗</div>
+  <p style="font-weight: bold; font-size: 18px;">ゴールまでは行ってみてね</p>
+  
+  <div class="explanation-box" id="exp-easy">
+    <strong>【解説】</strong><br><br>
+    注目すべきは、「数字の中に丸（○）のような囲まれた空間がいくつあるか」です。<br><br>
+    「1, 2, 3, 5, 7」には丸がありません（0個）<br>
+    「0, 6, 9」には丸が1つあります（1個）<br>
+    「8」には丸が上に1つ、下に1つあります（2個）<br><br>
+    この法則で例題を見てみると……<br>
+    1 3 7 ＝ 丸はないので「0」<br>
+    6 1 2 ＝ 6に丸が1つあるので「1」<br>
+    9 0 8 ＝ 9(1個)＋0(1個)＋8(2個) ＝ 「4」<br>
+    8 8 6 ＝ 8(2個)＋8(2個)＋6(1個) ＝ 「5」<br><br>
+    問題のA・B・Cを解いてみます。<br>
+    A：8 0 6 ＝ 8(2個)＋0(1個)＋6(1個) ＝ 4<br>
+    B：5 9 0 ＝ 5(0個)＋9(1個)＋0(1個) ＝ 2<br>
+    C：8 8 8 ＝ 8(2個)＋8(2個)＋8(2個) ＝ 6<br><br>
+    出た数字を左から並べると、導き出される3桁の数字は「426」になります。
+  </div>
+
+  <div class="explanation-box" id="exp-hard" style="display:none;">
+    <strong>【解説】</strong><br><br>
+    月を「英語（アルファベット）」に変換し、その文字数を数えるのが正解です。<br><br>
+    睦月（1月）＝ JANUARY （7文字）<br>
+    如月（2月）＝ FEBRUARY （8文字）<br>
+    弥生（3月）＝ MARCH （5文字）<br>
+    卯月（4月）＝ APRIL （5文字）<br><br>
+    問題の3つの月をこれに当てはめると……<br>
+    長月（9月）＝ SEPTEMBER （9文字）<br>
+    皐月（5月）＝ MAY （3文字）<br>
+    師走（12月）＝ DECEMBER （8文字）<br><br>
+    よって、導き出される3桁の数字は「938」となります。
+  </div>
+</div>
+
+
+<div id="page6" class="page">
+  <div class="clear-text">クリア</div>
+  <p style="font-size: 18px; margin-bottom: 5px;">残り時間</p>
+  <div id="clear-time" style="font-size: 36px; font-weight: bold; color: #333;"></div>
+</div>
+
+
+<script>
+  // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+  // ▼▼ コマンド設定（制限時間を変更したい時はここをいじってください） ▼▼
+  // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+  
+  // 【全体の制限時間】 05:00:00 の設定
+  const TIME_LIMIT_MIN = 5; // 分
+  const TIME_LIMIT_SEC = 0; // 秒
+  const TIME_LIMIT_MS  = 0; // コンマ秒（ミリ秒）
+  
+  // 【ヒントが解放される残り時間】 02:00:00 の設定
+  const HINT_TIME_MIN = 2; // 分
+  const HINT_TIME_SEC = 0; // 秒
+  const HINT_TIME_MS  = 0; // コンマ秒（ミリ秒）
+  
+  // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+  // ▲▲ コマンド設定 ここまで ▲▲
+  // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+
+  // 裏側で動く変数たち
+  let difficulty = 'easy';
+  let totalTimeMs = (TIME_LIMIT_MIN * 60 * 1000) + (TIME_LIMIT_SEC * 1000) + TIME_LIMIT_MS;
+  let hintTimeMs = (HINT_TIME_MIN * 60 * 1000) + (HINT_TIME_SEC * 1000) + HINT_TIME_MS;
+  let timerInterval;
+  let endTime;
+  let timeLeftMs;
+
+  // 画面を開いた時の準備
+  window.onload = () => {
+    // 0〜100歳の選択肢を作る
+    const ageSelect = document.getElementById('age');
+    for(let i = 0; i <= 100; i++) {
+      let opt = document.createElement('option');
+      opt.value = i;
+      opt.text = i + '歳';
+      ageSelect.add(opt);
+    }
+    
+    // 3桁の入力欄を0〜9で回せるように作る
+    ['ans1', 'ans2', 'ans3'].forEach(id => {
+      const sel = document.getElementById(id);
+      for(let i = 0; i <= 9; i++) {
+        let opt = document.createElement('option');
+        opt.value = i;
+        opt.text = i;
+        sel.add(opt);
+      }
+    });
+  };
+
+  // ページを切り替える裏技関数
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+  }
+
+  // 【ページ1 → ページ2】 難易度を記録して進む
+  function goToPage2() {
+    difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+    
+    // 選んだ難易度に合わせて問題と解説をスタンバイ
+    if(difficulty === 'easy') {
+      document.getElementById('q-easy').style.display = 'block';
+      document.getElementById('q-hard').style.display = 'none';
+      document.getElementById('exp-easy').style.display = 'block';
+      document.getElementById('exp-hard').style.display = 'none';
+    } else {
+      document.getElementById('q-easy').style.display = 'none';
+      document.getElementById('q-hard').style.display = 'block';
+      document.getElementById('exp-easy').style.display = 'none';
+      document.getElementById('exp-hard').style.display = 'block';
+    }
+    
+    showPage('page2');
+  }
+
+  // 【ページ2 → ページ3】 タイマー始動！
+  function startGame() {
+    showPage('page3');
+    document.getElementById('timer-container').style.display = 'block';
+    
+    // 終了時刻を計算してカウントダウン開始（ズレ防止の仕組み）
+    endTime = Date.now() + totalTimeMs;
+    timerInterval = setInterval(updateTimer, 10); // 10ミリ秒（コンマ秒）ごとに動かす
+  }
+
+  // タイマーの計算と表示
+  function updateTimer() {
+    const now = Date.now();
+    timeLeftMs = endTime - now;
+    
+    // 0秒になった時の処理
+    if(timeLeftMs <= 0) {
+      timeLeftMs = 0;
+      clearInterval(timerInterval);
+      formatAndDisplayTime(0);
+      missionFailed(); // ページ5へ強制移動
+      return;
+    }
+    
+    formatAndDisplayTime(timeLeftMs);
+    
+    // 設定した残り時間を下回ったらヒントボタンをONにする
+    if(timeLeftMs <= hintTimeMs) {
+      document.getElementById('hint-btn').disabled = false;
+      document.getElementById('hint-btn').textContent = "ヒントを見る";
+    }
+  }
+
+  // 時間を「分：秒：コンマ秒」の形に変換する
+  function formatAndDisplayTime(ms) {
+    let totalSeconds = Math.floor(ms / 1000);
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
+    let centiseconds = Math.floor((ms % 1000) / 10); // 10ミリ秒単位（2桁）
+
+    // 00:00:00 のように0埋めする
+    let mStr = minutes.toString().padStart(2, '0');
+    let sStr = seconds.toString().padStart(2, '0');
+    let cStr = centiseconds.toString().padStart(2, '0');
+    
+    let timeString = `${mStr}:${sStr}:${cStr}`;
+    document.getElementById('timer-display').textContent = timeString;
+    return timeString; // 後でクリア画面で使うために返す
+  }
+
+  // ヒントを表示する
+  function showHint() {
+    const hintText = document.getElementById('hint-text');
+    if(difficulty === 'easy') {
+      hintText.textContent = "数字の形に着目！◯の数は？";
+    } else {
+      hintText.textContent = "頭を柔らかく！日本語じゃないかも…？";
+    }
+    hintText.style.display = 'block';
+    document.getElementById('hint-btn').style.display = 'none'; // ボタンは消す
+  }
+
+  // 【ページ3 → ページ4】 暗号文の正誤判定
+  function checkAnswer() {
+    const v1 = document.getElementById('ans1').value;
+    const v2 = document.getElementById('ans2').value;
+    const v3 = document.getElementById('ans3').value;
+    const userAnswer = v1 + v2 + v3;
+    
+    const correctAnswer = (difficulty === 'easy') ? '426' : '938';
+    
+    if(userAnswer === correctAnswer) {
+      alert("正解！次のミッションへ進みます。");
+      showPage('page4');
+    } else {
+      alert("パスワードが違います。もう一度考えてみよう！");
+    }
+  }
+
+  // 【ページ4 → ページ6】 最後のキーワード判定
+  function checkFinal() {
+    let keyword = document.getElementById('final-keyword').value;
+    // スマホの予測変換対策で、入力されたスペース（空白）をすべて無視する
+    keyword = keyword.replace(/\s+/g, "");
+    
+    if(keyword === "ミッションクリア") {
+      clearInterval(timerInterval); // 時計を止める
+      document.getElementById('timer-container').style.display = 'none'; // 上部の時計を隠す
+      
+      // 止めた瞬間の時間を取得してページ6に表示
+      const stoppedTime = formatAndDisplayTime(timeLeftMs);
+      document.getElementById('clear-time').textContent = stoppedTime;
+      
+      showPage('page6');
+    } else {
+      alert("合言葉が違います。スタッフに確認してみよう！");
+    }
+  }
+
+  // 【タイムアップ → ページ5】 ミッション失敗
+  function missionFailed() {
+    document.getElementById('timer-container').style.display = 'none';
+    document.getElementById('red-filter').style.display = 'block'; // 赤フィルターON
+    showPage('page5');
+  }
+</script>
+</body>
+</html>
