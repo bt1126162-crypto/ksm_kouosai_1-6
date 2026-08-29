@@ -1,7 +1,20 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&display=swap" rel="stylesheet">
+
 <meta charset="UTF-8">
+
+<style>
+.koukousai-title {
+    font-family: "Yuji Syuku", serif;
+    font-size: 60px;
+}
+</style>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>香煌祭ミッション</title>
 <style>
@@ -223,8 +236,8 @@
 
 
 <div id="page1" class="page active">
-  <h1>香煌祭</h1>
-  <h1>プレイヤー設定</h1>
+  <h1 class="koukousai-title">香煌祭</h1>
+　<h1>プレイヤー設定</h1>
   
   <div class="form-group">
     <label for="age">年齢</label>
@@ -279,8 +292,7 @@
     <p>「 長月 ・ 皐月 ・ 師走 」 ＝ ？？？</p>
   </div>
 
-  <button class="btn" id="hint-btn" onclick="showHint()" disabled>ヒント（時間が来ると押せます）</button>
-  <div id="hint-text"></div>
+<button class="btn" id="hint-btn" onclick="showHint()" disabled>ヒント：あと03:00で解放</button>  <div id="hint-text"></div>
   
   <div class="answer-inputs">
     <select id="ans1"></select>
@@ -353,14 +365,14 @@
   // ▼▼ コマンド設定（制限時間を変更したい時はここをいじってください） ▼▼
   // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
   
-  // 【全体の制限時間】 05:00:00 の設定
+  // 【全体の制限時間】 07:00:00 の設定
   const TIME_LIMIT_MIN = 7; // 分
   const TIME_LIMIT_SEC = 0; // 秒
   const TIME_LIMIT_MS  = 0; // コンマ秒（ミリ秒）
   
-  // 【ヒントが解放される残り時間】 02:00:00 の設定
+  // 【ヒントが解放される残り時間】 04:30:00 の設定
   const HINT_TIME_MIN = 4; // 分
-  const HINT_TIME_SEC = 0; // 秒
+  const HINT_TIME_SEC = 30; // 秒
   const HINT_TIME_MS  = 0; // コンマ秒（ミリ秒）
   
   // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -379,21 +391,25 @@
   window.onload = () => {
     // 0〜100歳の選択肢を作る
     const ageSelect = document.getElementById('age');
-    for(let i = 0; i <= 100; i++) {
-      let opt = document.createElement('option');
-      opt.value = i;
-      opt.text = i + '歳';
-      ageSelect.add(opt);
+    if(ageSelect) {
+      for(let i = 0; i <= 100; i++) {
+        let opt = document.createElement('option');
+        opt.value = i;
+        opt.text = i + '歳';
+        ageSelect.add(opt);
+      }
     }
     
     // 3桁の入力欄を0〜9で回せるように作る
     ['ans1', 'ans2', 'ans3'].forEach(id => {
       const sel = document.getElementById(id);
-      for(let i = 0; i <= 9; i++) {
-        let opt = document.createElement('option');
-        opt.value = i;
-        opt.text = i;
-        sel.add(opt);
+      if(sel) {
+        for(let i = 0; i <= 9; i++) {
+          let opt = document.createElement('option');
+          opt.value = i;
+          opt.text = i;
+          sel.add(opt);
+        }
       }
     });
   };
@@ -450,11 +466,24 @@
     
     formatAndDisplayTime(timeLeftMs);
     
-    // 設定した残り時間を下回ったらヒントボタンをONにする
-    if(timeLeftMs <= hintTimeMs) {
-      document.getElementById('hint-btn').disabled = false;
-      document.getElementById('hint-btn').textContent = "ヒントを見る";
+    // ▼▼ ヒントボタンのカウントダウン処理（喧嘩しないように合体させました！） ▼▼
+    const hintBtn = document.getElementById('hint-btn');
+    if (hintBtn) {
+      if(timeLeftMs <= hintTimeMs) {
+        // 設定した残り時間を下回ったらヒントボタンをONにする
+        hintBtn.disabled = false;
+        hintBtn.textContent = "ヒントを見る";
+      } else {
+        // まだ時間になっていない時は、「解放まであと何分何秒か」を計算して表示する
+        let waitTimeMs = timeLeftMs - hintTimeMs;
+        let waitTotalSec = Math.floor(waitTimeMs / 1000);
+        let waitMin = Math.floor(waitTotalSec / 60).toString().padStart(2, '0');
+        let waitSec = (waitTotalSec % 60).toString().padStart(2, '0');
+        
+        hintBtn.textContent = `ヒント：あと${waitMin}:${waitSec}で解放`;
+      }
     }
+    // ▲▲ ヒント処理ここまで ▲▲
   }
 
   // 時間を「分：秒：コンマ秒」の形に変換する
@@ -530,5 +559,6 @@
     showPage('page5');
   }
 </script>
+
 </body>
 </html>
