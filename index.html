@@ -28,7 +28,7 @@
     touch-action: manipulation; /* ダブルタップズーム防止 */
   }
   
-  /* 画面上部に固定されるタイマー（ページ3、4で使用） */
+  /* 画面上部に固定されるタイマー（ページ3、4、5で使用） */
   #timer-container {
     display: none;
     position: fixed;
@@ -62,7 +62,7 @@
   }
   
   /* タイマーが出ないページは中央寄せに調整 */
-  #page1, #page2, #page5, #page6 {
+  #page1, #page2, #page6 {
     justify-content: center;
     padding-top: 20px;
   }
@@ -126,7 +126,7 @@
     transform: rotate(-5deg);
     display: inline-block;
     margin-bottom: 30px;
-    font-family: 'Times New Roman', serif; /* 明朝体っぽくしてスタンプ感を出す */
+    font-family: 'Times New Roman', serif;
   }
 
   /* 問題文エリア */
@@ -170,14 +170,13 @@
     text-align: center;
   }
 
-  /* ページ4の六角形マーク */
+  /* 六角形マーク */
   .hexagon {
     width: 120px;
     height: 138px;
     background-color: #FFC107;
-    /* CSSで正六角形を描画 */
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    margin: 30px auto;
+    margin: 20px auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -192,7 +191,7 @@
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: rgba(255, 0, 0, 0.3);
-    pointer-events: none; /* フィルター越しにスクロールできるようにする */
+    pointer-events: none;
     z-index: 9999;
   }
   
@@ -234,10 +233,9 @@
 
 <div id="red-filter"></div>
 
-
 <div id="page1" class="page active">
   <h1 class="koukousai-title">香煌祭</h1>
-　<h1>プレイヤー設定</h1>
+  <h1>プレイヤー設定</h1>
   
   <div class="form-group">
     <label for="age">年齢</label>
@@ -255,11 +253,9 @@
   <button class="btn" onclick="goToPage2()">上の内容で確定</button>
 </div>
 
-
 <div id="page2" class="page">
   <button class="btn" style="font-size: 26px; padding: 25px;" onclick="startGame()">GAME START</button>
 </div>
-
 
 <div id="page3" class="page">
   <div class="stamp">MISSION</div>
@@ -292,7 +288,8 @@
     <p>「 長月 ・ 皐月 ・ 師走 」 ＝ ？？？</p>
   </div>
 
-<button class="btn" id="hint-btn" onclick="showHint()" disabled>ヒント：あと03:00で解放</button>  <div id="hint-text"></div>
+  <button class="btn" id="hint-btn" onclick="showHint()" disabled>ヒント：あと03:00で解放</button>
+  <div id="hint-text"></div>
   
   <div class="answer-inputs">
     <select id="ans1"></select>
@@ -303,22 +300,26 @@
   <button class="btn" onclick="checkAnswer()">解答する</button>
 </div>
 
-
 <div id="page4" class="page">
   <div class="hexagon">★</div>
   
   <div class="form-group" style="margin-top: 20px;">
-    <input type="text" id="final-keyword" placeholder="宝を持ち帰りスタッフにスマホを見せよう">
+    <input type="text" id="final-keyword" placeholder="スタッフに画面を見せる">
   </div>
   
   <button class="btn" onclick="checkFinal()">送信</button>
 </div>
 
-
 <div id="page5" class="page">
   <div class="mission-failed">MISSION失敗</div>
-  <p style="font-weight: bold; font-size: 18px;">ゴールまでは行ってみてね</p>
+  <p style="font-weight: bold; font-size: 18px; margin-bottom: 10px;">ゴールまでは行ってみてね</p>
   
+  <div class="hexagon">★</div>
+  <div class="form-group" style="margin-top: 10px;">
+    <input type="text" id="timeout-keyword" placeholder="スタッフに画面を見せる">
+  </div>
+  <button class="btn" onclick="checkTimeoutFinal()">送信</button>
+
   <div class="explanation-box" id="exp-easy">
     <strong>【解説】</strong><br><br>
     注目すべきは、「数字の中に丸（○）のような囲まれた空間がいくつあるか」です。<br><br>
@@ -352,34 +353,31 @@
   </div>
 </div>
 
-
 <div id="page6" class="page">
-  <div class="clear-text">クリア</div>
-  <p style="font-size: 18px; margin-bottom: 5px;">残り時間</p>
+  <h1 id="clear-title" class="clear-text">クリア</h1>
+  <p style="font-size: 18px; margin-bottom: 5px;">かかった時間</p>
   <div id="clear-time" style="font-size: 36px; font-weight: bold; color: #333;"></div>
 </div>
 
-
 <script>
-  // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-  // ▼▼ コマンド設定（制限時間を変更したい時はここをいじってください） ▼▼
+// ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+  // ▼▼ 時間の設定（ここを変えると制限時間やヒントの時間が変わります） ▼▼
   // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
   
-  // 【全体の制限時間】 07:00:00 の設定
+  // 【全体の制限時間】
   const TIME_LIMIT_MIN = 7; // 分
   const TIME_LIMIT_SEC = 0; // 秒
   const TIME_LIMIT_MS  = 0; // コンマ秒（ミリ秒）
   
-  // 【ヒントが解放される残り時間】 04:30:00 の設定
+  // 【ヒントが解放されるまでの残り時間】
   const HINT_TIME_MIN = 4; // 分
   const HINT_TIME_SEC = 30; // 秒
   const HINT_TIME_MS  = 0; // コンマ秒（ミリ秒）
   
   // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-  // ▲▲ コマンド設定 ここまで ▲▲
+  // ▲▲ 設定ここまで ▲▲
   // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-
-  // 裏側で動く変数たち
+  
   let difficulty = 'easy';
   let totalTimeMs = (TIME_LIMIT_MIN * 60 * 1000) + (TIME_LIMIT_SEC * 1000) + TIME_LIMIT_MS;
   let hintTimeMs = (HINT_TIME_MIN * 60 * 1000) + (HINT_TIME_SEC * 1000) + HINT_TIME_MS;
@@ -387,9 +385,12 @@
   let endTime;
   let timeLeftMs;
 
-  // 画面を開いた時の準備
+  // カウントアップ用の変数
+  let countUpInterval;
+  let countUpStartTime;
+  let countUpMs = 0;
+
   window.onload = () => {
-    // 0〜100歳の選択肢を作る
     const ageSelect = document.getElementById('age');
     if(ageSelect) {
       for(let i = 0; i <= 100; i++) {
@@ -400,7 +401,6 @@
       }
     }
     
-    // 3桁の入力欄を0〜9で回せるように作る
     ['ans1', 'ans2', 'ans3'].forEach(id => {
       const sel = document.getElementById(id);
       if(sel) {
@@ -414,17 +414,14 @@
     });
   };
 
-  // ページを切り替える裏技関数
   function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
   }
 
-  // 【ページ1 → ページ2】 難易度を記録して進む
   function goToPage2() {
     difficulty = document.querySelector('input[name="difficulty"]:checked').value;
     
-    // 選んだ難易度に合わせて問題と解説をスタンバイ
     if(difficulty === 'easy') {
       document.getElementById('q-easy').style.display = 'block';
       document.getElementById('q-hard').style.display = 'none';
@@ -440,41 +437,34 @@
     showPage('page2');
   }
 
-  // 【ページ2 → ページ3】 タイマー始動！
   function startGame() {
     showPage('page3');
     document.getElementById('timer-container').style.display = 'block';
     
-    // 終了時刻を計算してカウントダウン開始（ズレ防止の仕組み）
     endTime = Date.now() + totalTimeMs;
-    timerInterval = setInterval(updateTimer, 10); // 10ミリ秒（コンマ秒）ごとに動かす
+    timerInterval = setInterval(updateTimer, 10);
   }
 
-  // タイマーの計算と表示
   function updateTimer() {
     const now = Date.now();
     timeLeftMs = endTime - now;
     
-    // 0秒になった時の処理
     if(timeLeftMs <= 0) {
       timeLeftMs = 0;
       clearInterval(timerInterval);
       formatAndDisplayTime(0);
-      missionFailed(); // ページ5へ強制移動
+      missionFailed();
       return;
     }
     
     formatAndDisplayTime(timeLeftMs);
     
-    // ▼▼ ヒントボタンのカウントダウン処理（喧嘩しないように合体させました！） ▼▼
     const hintBtn = document.getElementById('hint-btn');
     if (hintBtn) {
       if(timeLeftMs <= hintTimeMs) {
-        // 設定した残り時間を下回ったらヒントボタンをONにする
         hintBtn.disabled = false;
         hintBtn.textContent = "ヒントを見る";
       } else {
-        // まだ時間になっていない時は、「解放まであと何分何秒か」を計算して表示する
         let waitTimeMs = timeLeftMs - hintTimeMs;
         let waitTotalSec = Math.floor(waitTimeMs / 1000);
         let waitMin = Math.floor(waitTotalSec / 60).toString().padStart(2, '0');
@@ -483,27 +473,39 @@
         hintBtn.textContent = `ヒント：あと${waitMin}:${waitSec}で解放`;
       }
     }
-    // ▲▲ ヒント処理ここまで ▲▲
   }
 
-  // 時間を「分：秒：コンマ秒」の形に変換する
   function formatAndDisplayTime(ms) {
     let totalSeconds = Math.floor(ms / 1000);
     let minutes = Math.floor(totalSeconds / 60);
     let seconds = totalSeconds % 60;
-    let centiseconds = Math.floor((ms % 1000) / 10); // 10ミリ秒単位（2桁）
+    let centiseconds = Math.floor((ms % 1000) / 10);
 
-    // 00:00:00 のように0埋めする
     let mStr = minutes.toString().padStart(2, '0');
     let sStr = seconds.toString().padStart(2, '0');
     let cStr = centiseconds.toString().padStart(2, '0');
     
     let timeString = `${mStr}:${sStr}:${cStr}`;
     document.getElementById('timer-display').textContent = timeString;
-    return timeString; // 後でクリア画面で使うために返す
+    return timeString;
   }
 
-  // ヒントを表示する
+  // カウントアップ用の時間フォーマット関数
+  function formatAndDisplayCountUp(ms) {
+    let totalSeconds = Math.floor(ms / 1000);
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
+    let centiseconds = Math.floor((ms % 1000) / 10);
+
+    let mStr = minutes.toString().padStart(2, '0');
+    let sStr = seconds.toString().padStart(2, '0');
+    let cStr = centiseconds.toString().padStart(2, '0');
+    
+    let timeString = `${mStr}:${sStr}:${cStr}`;
+    document.getElementById('timer-display').textContent = timeString;
+    return timeString;
+  }
+
   function showHint() {
     const hintText = document.getElementById('hint-text');
     if(difficulty === 'easy') {
@@ -512,10 +514,9 @@
       hintText.textContent = "頭を柔らかく！日本語じゃないかも…？";
     }
     hintText.style.display = 'block';
-    document.getElementById('hint-btn').style.display = 'none'; // ボタンは消す
+    document.getElementById('hint-btn').style.display = 'none';
   }
 
-  // 【ページ3 → ページ4】 暗号文の正誤判定
   function checkAnswer() {
     const v1 = document.getElementById('ans1').value;
     const v2 = document.getElementById('ans2').value;
@@ -532,19 +533,17 @@
     }
   }
 
-  // 【ページ4 → ページ6】 最後のキーワード判定
   function checkFinal() {
     let keyword = document.getElementById('final-keyword').value;
-    // スマホの予測変換対策で、入力されたスペース（空白）をすべて無視する
     keyword = keyword.replace(/\s+/g, "");
     
     if(keyword === "ミッションクリア") {
-      clearInterval(timerInterval); // 時計を止める
-      document.getElementById('timer-container').style.display = 'none'; // 上部の時計を隠す
+      clearInterval(timerInterval);
+      document.getElementById('timer-container').style.display = 'none';
       
-      // 止めた瞬間の時間を取得してページ6に表示
-      const stoppedTime = formatAndDisplayTime(timeLeftMs);
+      const stoppedTime = formatAndDisplayTime(totalTimeMs - timeLeftMs);
       document.getElementById('clear-time').textContent = stoppedTime;
+      document.getElementById('clear-title').textContent = "クリア！";
       
       showPage('page6');
     } else {
@@ -552,11 +551,46 @@
     }
   }
 
-  // 【タイムアップ → ページ5】 ミッション失敗
   function missionFailed() {
-    document.getElementById('timer-container').style.display = 'none';
-    document.getElementById('red-filter').style.display = 'block'; // 赤フィルターON
+    document.getElementById('timer-container').style.display = 'block';
+    document.getElementById('red-filter').style.display = 'block';
     showPage('page5');
+
+    countUpStartTime = Date.now();
+    countUpInterval = setInterval(() => {
+      countUpMs = Date.now() - countUpStartTime;
+      formatAndDisplayCountUp(countUpMs);
+    }, 10);
+  }
+
+// 【タイムアップ後のページ5での合言葉判定】
+  function checkTimeoutFinal() {
+    let keyword = document.getElementById('timeout-keyword').value;
+    keyword = keyword.replace(/\s+/g, "");
+    
+    if(keyword === "ミッションクリア") {
+      clearInterval(countUpInterval); // カウントアップを止める
+      document.getElementById('timer-container').style.display = 'none';
+      
+      // 赤フィルターを消す
+      document.getElementById('red-filter').style.display = 'none';
+      
+      // ★ ここで設定した制限時間（分・秒）の数字を自動で合体させる！
+      let limitText = `${TIME_LIMIT_MIN}分`;
+      if (TIME_LIMIT_SEC > 0) {
+        limitText += `${TIME_LIMIT_SEC}秒`;
+      }
+      
+      const extraTimeStr = formatAndDisplayCountUp(countUpMs);
+      document.getElementById('clear-time').textContent = `${limitText} ＋ ${extraTimeStr}`;
+      
+      // タイトルを「ナイストライ！」に変更
+      document.getElementById('clear-title').textContent = "ナイストライ！";
+      
+      showPage('page6');
+    } else {
+      alert("合言葉が違います。もう一度考えてみよう！");
+    }
   }
 </script>
 
