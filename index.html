@@ -98,23 +98,24 @@
   /* タイマーが出ないページは中央寄せに調整 */
   #page1, #page2, #page6 {
     justify-content: center;
-    padding-top: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 
   /* タイトルデザイン */
   .koukousai-title {
     font-family: "Yuji Syuku", serif;
-    font-size: 50px;
+    font-size: 40px;
     color: #ffffff;
     text-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     text-align: center;
   }
 
   h1 { 
-    font-size: 20px; 
+    font-size: 17px; 
     text-align: center; 
-    margin-bottom: 20px; 
+    margin-bottom: 10px; 
     color: #94a3b8;
     letter-spacing: 1px;
   }
@@ -124,8 +125,8 @@
     display: block;
     width: 85%;
     max-width: 320px;
-    padding: 15px;
-    margin: 20px auto;
+    padding: 12px;
+    margin: 12px auto 0 auto;
     background: linear-gradient(45deg, #00ffcc, #0077ff);
     color: #0b0f19;
     border: none;
@@ -152,14 +153,14 @@
   .form-group {
     width: 100%;
     max-width: 300px;
-    margin: 15px 0;
+    margin: 8px 0;
   }
-  label { font-weight: bold; display: block; margin-bottom: 8px; color: #00ffcc; font-size: 14px; }
+  label { font-weight: bold; display: block; margin-bottom: 4px; color: #00ffcc; font-size: 13px; }
   
   select, input[type="text"] {
     width: 100%;
-    padding: 12px;
-    font-size: 16px;
+    padding: 9px 12px;
+    font-size: 15px;
     background: rgba(15, 23, 42, 0.8);
     border: 1px solid rgba(0, 255, 204, 0.3);
     color: #fff;
@@ -175,22 +176,43 @@
   .radio-group {
     display: flex;
     justify-content: space-around;
-    margin-top: 10px;
+    margin-top: 5px;
   }
-  .radio-group label { font-weight: normal; font-size: 16px; display: flex; align-items: center; gap: 5px; color: #fff; cursor: pointer; }
+  /* ラジオボタンの選択中を分かりやすく光らせる装飾 */
+  .radio-group label { 
+    font-weight: normal; 
+    font-size: 15px; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+    color: #94a3b8; 
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(15, 23, 42, 0.5);
+    transition: all 0.2s;
+  }
+  .radio-group label:has(input:checked) {
+    color: #00ffcc;
+    border-color: #00ffcc;
+    background: rgba(0, 255, 204, 0.1);
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+    font-weight: bold;
+  }
 
   /* はんこ風のMISSIONテキスト */
   .stamp {
     color: #ff3366;
     border: 4px solid #ff3366;
     border-radius: 8px;
-    padding: 10px 25px;
-    font-size: 30px;
+    padding: 6px 20px;
+    font-size: 26px;
     font-weight: 900;
     letter-spacing: 4px;
     transform: rotate(-5deg);
     display: inline-block;
-    margin-bottom: 25px;
+    margin-bottom: 12px;
     font-family: 'Times New Roman', serif;
     box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
     background: rgba(15, 23, 42, 0.6);
@@ -201,12 +223,12 @@
     background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(0, 255, 204, 0.3);
     border-left: 5px solid #00ffcc;
-    padding: 20px;
+    padding: 15px;
     width: 100%;
     max-width: 350px;
-    margin-bottom: 20px;
-    line-height: 1.6;
-    font-size: 14px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+    font-size: 13px;
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   }
@@ -215,13 +237,13 @@
   .answer-inputs {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin: 12px 0;
   }
   .answer-inputs select {
-    width: 65px;
-    height: 55px;
-    font-size: 24px;
+    width: 60px;
+    height: 50px;
+    font-size: 22px;
     text-align: center;
     padding: 0;
     background: rgba(15, 23, 42, 0.9);
@@ -234,13 +256,14 @@
     font-weight: bold;
     background: rgba(45, 30, 10, 0.9);
     border: 1px solid rgba(255, 170, 0, 0.4);
-    padding: 15px;
+    padding: 10px;
     border-radius: 8px;
-    margin-bottom: 20px;
+    margin: 8px 0;
     width: 100%;
     max-width: 350px;
     text-align: center;
     box-shadow: 0 0 10px rgba(255, 170, 0, 0.2);
+    font-size: 13px;
   }
 
   /* 六角形マーク */
@@ -314,7 +337,7 @@
   .cyber-box {
     background: rgba(15, 23, 42, 0.8);
     border: 1px solid rgba(0, 255, 204, 0.2);
-    padding: 25px;
+    padding: 18px 20px;
     border-radius: 16px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     width: 90%;
@@ -327,7 +350,6 @@
 </head>
 <body>
 
-<!-- レーザー背景のエフェクト -->
 <div class="laser-bg">
     <div class="laser-beam"></div>
     <div class="laser-beam"></div>
@@ -341,7 +363,6 @@
 
 <div id="red-filter"></div>
 
-<!-- ページ1：プレイヤー設定 -->
 <div id="page1" class="page active">
   <div class="cyber-box">
     <h1 class="koukousai-title">香煌祭</h1>
@@ -350,6 +371,11 @@
     <div class="form-group">
       <label for="age">年齢</label>
       <select id="age"></select>
+    </div>
+    
+    <div class="form-group">
+      <label for="codename">コードネーム</label>
+      <input type="text" id="codename" placeholder="例：プレイヤー1">
     </div>
     
     <div class="form-group">
@@ -364,7 +390,6 @@
   </div>
 </div>
 
-<!-- ページ2：スタート画面 -->
 <div id="page2" class="page" style="background: linear-gradient(135deg, #0b0f19 0%, #1a0b2e 100%);">
   <div class="cyber-box" style="text-align: center;">
     <h1 style="color: #fff; font-size: 24px; margin-bottom: 5px;">Laser Trap Stealth</h1>
@@ -373,20 +398,19 @@
   </div>
 </div>
 
-<!-- ページ3：問題画面 -->
 <div id="page3" class="page">
   <div class="stamp">MISSION</div>
   
   <div class="question-box" id="q-easy">
     <p>以下の法則で、3つの数字のグループが別の数字に変身しています。</p>
-    <p style="margin: 10px 0; font-family: monospace; color: #00ffcc;">
+    <p style="margin: 6px 0; font-family: monospace; color: #00ffcc;">
       1 3 7 ＝ 0<br>
       6 1 2 ＝ 1<br>
       9 0 8 ＝ 4<br>
       8 8 6 ＝ 5
     </p>
     <p>では、次のA、B、Cを解いて、出た数字を左から順番に並べた「3桁の数字」を並べて暗証番号を解読せよ。</p>
-    <p style="margin-top: 10px; font-family: monospace; color: #00ffcc;">
+    <p style="margin-top: 6px; font-family: monospace; color: #00ffcc;">
       A： 8 0 6 ＝ ？<br>
       B： 5 9 0 ＝ ？<br>
       C： 8 8 8 ＝ ？
@@ -395,22 +419,20 @@
   
   <div class="question-box" id="q-hard" style="display:none;">
     <p>以下の法則で和風月名（旧暦の月）が数字に変換されています。</p>
-    <p style="margin: 10px 0; font-family: monospace; color: #00ffcc;">
+    <p style="margin: 6px 0; font-family: monospace; color: #00ffcc;">
       睦月 ＝ 7<br>
       如月 ＝ 8<br>
       弥生 ＝ 5<br>
       卯月 ＝ 5
     </p>
     <p>では、この法則に従い、以下の3つの月が表す「3桁の数字」をもとに暗証番号を導け？</p>
-    <p style="margin-top: 10px; font-family: monospace; color: #00ffcc;">「 長月 ・ 皐月 ・ 師走 」 ＝ ？？？</p>
+    <p style="margin-top: 6px; font-family: monospace; color: #00ffcc;">「 長月 ・ 皐月 ・ 師走 」 ＝ ？？？</p>
   </div>
 
-  <!-- 第1ヒント -->
-  <button class="btn" id="hint-btn" onclick="showHint()" disabled style="background: #334155; color: #cbd5e1;">ヒント：あと03:00で解放</button>
+  <button class="btn" id="hint-btn" onclick="showHint()" disabled style="background: #334155; color: #cbd5e1; margin-top: 4px;">ヒント：03:00後に解放</button>
   <div id="hint-text"></div>
 
-  <!-- Hard専用：第2ヒント -->
-  <button class="btn" id="hint2-btn" onclick="showHint2()" style="display:none; background: #334155; color: #cbd5e1;" disabled>第2ヒント：あと02:00で解放</button>
+  <button class="btn" id="hint2-btn" onclick="showHint2()" style="display:none; background: #334155; color: #cbd5e1; margin-top: 4px;" disabled>ヒント２：02:00後に解放</button>
   <div id="hint2-text"></div>
   
   <div class="answer-inputs">
@@ -419,10 +441,9 @@
     <select id="ans3"></select>
   </div>
   
-  <button class="btn" onclick="checkAnswer()">解答する</button>
+  <button class="btn" style="margin-top: 4px;" onclick="checkAnswer()">解答する</button>
 </div>
 
-<!-- ページ4：最終コード入力画面 -->
 <div id="page4" class="page" style="justify-content: center;">
   <div class="cyber-box">
     <div class="hexagon">★</div>
@@ -434,7 +455,6 @@
   </div>
 </div>
 
-<!-- ページ5：タイムアップ / ミッション失敗画面 -->
 <div id="page5" class="page" style="justify-content: center;">
   <div class="cyber-box" style="border-color: rgba(255, 51, 102, 0.4); box-shadow: 0 0 20px rgba(255, 51, 102, 0.2);">
     <div class="mission-failed">MISSION失敗</div>
@@ -466,7 +486,7 @@
 
     <div class="explanation-box" id="exp-hard" style="display:none;">
       <strong style="color: #00ffcc;">【解説】</strong><br><br>
-      月を「英語（アルファベット）」に変換し、その文字数を数えるのが正解です。<br><br>
+      月を英語（アルファベット）に変換し、その文字数を数えるのが正解です。<br><br>
       睦月（1月）＝ JANUARY （7文字）<br>
       如月（2月）＝ FEBRUARY （8文字）<br>
       弥生（3月）＝ MARCH （5文字）<br>
@@ -480,7 +500,6 @@
   </div>
 </div>
 
-<!-- ページ6：クリア画面 -->
 <div id="page6" class="page" style="justify-content: center;">
   <div class="cyber-box">
     <h1 id="clear-title" class="clear-text">クリア</h1>
@@ -490,30 +509,25 @@
 </div>
 
 <script>
-  // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-  // ▼▼ 時間の設定 ▼▼
-  // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  //【時間の設定エリア】 ここで制限時間やヒントのタイミングを変更できます
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const TIME_LIMIT_MIN = 7;   // 制限時間（分）
+  const TIME_LIMIT_SEC = 0;   // 制限時間（秒）
   
-  const TIME_LIMIT_MIN = 7; // 分
-  const TIME_LIMIT_SEC = 0; // 秒
-  const TIME_LIMIT_MS  = 0; // コンマ秒（ミリ秒）
-  
-  const HINT_TIME_MIN = 4; // 分
-  const HINT_TIME_SEC = 30; // 秒
-  const HINT_TIME_MS  = 0; // コンマ秒（ミリ秒）
+  const HINT_TIME_MIN  = 4;   // ヒント1が出る時間（分）
+  const HINT_TIME_SEC  = 30;  // ヒント1が出る時間（秒）
 
-  const HINT2_TIME_MIN = 3; // 分
-  const HINT2_TIME_SEC = 0; // 秒
-  const HINT2_TIME_MS  = 0; // コンマ秒（ミリ秒）
-  
-  // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-  // ▲▲ 設定ここまで ▲▲
-  // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+  const HINT2_TIME_MIN = 3;   // ヒント2が出る時間（分）
+  const HINT2_TIME_SEC = 0;   // ヒント2が出る時間（秒）
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwQItwKfF7o5eqdW4774L7e8vlJvckwmOxJ8o-rIUJcp9OB2z-H_lKBINfHW1nuxTTs/exec';
   
   let difficulty = 'easy';
-  let totalTimeMs = (TIME_LIMIT_MIN * 60 * 1000) + (TIME_LIMIT_SEC * 1000) + TIME_LIMIT_MS;
-  let hintTimeMs = (HINT_TIME_MIN * 60 * 1000) + (HINT_TIME_SEC * 1000) + HINT_TIME_MS;
-  let hint2TimeMs = (HINT2_TIME_MIN * 60 * 1000) + (HINT2_TIME_SEC * 1000) + HINT2_TIME_MS;
+  let totalTimeMs = (TIME_LIMIT_MIN * 60 * 1000) + (TIME_LIMIT_SEC * 1000);
+  let hintTimeMs = (HINT_TIME_MIN * 60 * 1000) + (HINT_TIME_SEC * 1000);
+  let hint2TimeMs = (HINT2_TIME_MIN * 60 * 1000) + (HINT2_TIME_SEC * 1000);
   
   let timerInterval;
   let endTime;
@@ -595,7 +609,6 @@
     
     formatAndDisplayTime(timeLeftMs);
 
-    // 残り30秒未満のとき、うっすら赤く点滅
     const redFilter = document.getElementById('red-filter');
     if (timeLeftMs <= 30000) {
       redFilter.style.display = 'block';
@@ -618,7 +631,7 @@
         let waitMin = Math.floor(waitTotalSec / 60).toString().padStart(2, '0');
         let waitSec = (waitTotalSec % 60).toString().padStart(2, '0');
         
-        hintBtn.textContent = `ヒント：あと${waitMin}:${waitSec}で解放`;
+        hintBtn.textContent = `ヒント：${waitMin}:${waitSec}後に解放`;
       }
     }
 
@@ -627,7 +640,7 @@
       if (hint2Btn) {
         if(timeLeftMs <= hint2TimeMs) {
           hint2Btn.disabled = false;
-          hint2Btn.textContent = "第2ヒントを見る";
+          hint2Btn.textContent = "ヒント２を見る";
           hint2Btn.style.background = "linear-gradient(45deg, #ffaa00, #ff5500)";
           hint2Btn.style.color = "#fff";
         } else {
@@ -636,7 +649,7 @@
           let waitMin2 = Math.floor(waitTotalSec2 / 60).toString().padStart(2, '0');
           let waitSec2 = (waitTotalSec2 % 60).toString().padStart(2, '0');
           
-          hint2Btn.textContent = `第2ヒント：あと${waitMin2}:${waitSec2}で解放`;
+          hint2Btn.textContent = `ヒント２：${waitMin2}:${waitSec2}後に解放`;
         }
       }
     }
@@ -706,12 +719,33 @@
     }
   }
 
+  function sendScoreToSpreadsheet(clearTimeString) {
+    if (SHEET_API_URL.startsWith('http')) {
+      const ageVal = document.getElementById('age').value;
+      const codenameVal = document.getElementById('codename').value || '名無し';
+      
+      const sendData = {
+        difficulty: difficulty.toUpperCase(),
+        age: ageVal + '歳',
+        codename: codenameVal,
+        // 先頭に「タイム：」という文字を挟むことで、スプレッドシートに絶対に日付・時刻と勘違いさせず、ただの文字列（テキスト）として保持させます
+        clearTime: 'タイム: ' + clearTimeString
+      };
+      
+      fetch(SHEET_API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sendData)
+      }).catch(err => console.log('送信エラー', err));
+    }
+  }
+
   function checkFinal() {
     let keyword = document.getElementById('final-keyword').value;
     keyword = keyword.replace(/\s+/g, "");
     
     if(keyword === "ミッションクリア") {
-      // ★ゲームクリア！タイマーを完全に止めて、赤フィルター＆点滅も強制消去する！
       clearInterval(timerInterval);
       const redFilter = document.getElementById('red-filter');
       redFilter.classList.remove('flashing');
@@ -723,6 +757,8 @@
       document.getElementById('clear-time').textContent = stoppedTime;
       document.getElementById('clear-title').textContent = "クリア！";
       
+      sendScoreToSpreadsheet(stoppedTime);
+      
       showPage('page6');
     } else {
       alert("合言葉が違います。スタッフに確認してみよう！");
@@ -732,7 +768,6 @@
   function missionFailed() {
     document.getElementById('timer-container').style.display = 'block';
     
-    // タイムアップ時は点滅を外し、はっきりとした赤フィルターを固定表示
     const redFilter = document.getElementById('red-filter');
     redFilter.classList.remove('flashing');
     redFilter.style.display = 'block';
@@ -752,7 +787,6 @@
     keyword = keyword.replace(/\s+/g, "");
     
     if(keyword === "ミッションクリア") {
-      // ★タイムアップ後のクリア時も、カウントアップを止めて赤フィルターを消す！
       clearInterval(countUpInterval);
       document.getElementById('timer-container').style.display = 'none';
       document.getElementById('red-filter').style.display = 'none';
@@ -763,8 +797,12 @@
       }
       
       const extraTimeStr = formatAndDisplayCountUp(countUpMs);
-      document.getElementById('clear-time').textContent = `${limitText} ＋ ${extraTimeStr}`;
+      const totalClearStr = `${limitText} ＋ ${extraTimeStr}`;
+      
+      document.getElementById('clear-time').textContent = totalClearStr;
       document.getElementById('clear-title').textContent = "ナイストライ！";
+      
+      sendScoreToSpreadsheet(totalClearStr);
       
       showPage('page6');
     } else {
