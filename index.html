@@ -62,9 +62,20 @@
   }
   
   /* タイマーが出ないページは中央寄せに調整 */
-  #page1, #page2, #page6 {
+  #page1, #page6 {
     justify-content: center;
     padding-top: 20px;
+  }
+
+  /* ページ2（GAME START画面）専用：背景画像(.png) ＋ 白の半透明フィルター */
+  #page2 {
+    justify-content: center;
+    padding-top: 20px;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), 
+      url('文化祭ポスター レーザートラップステルス.png');
+    background-size: cover;
+    background-position: center;
   }
 
   /* UIパーツのデザイン */
@@ -157,7 +168,7 @@
   }
   
   /* ヒント表示 */
-  #hint-text {
+  #hint-text, #hint2-text {
     display: none;
     color: #E65100;
     font-weight: bold;
@@ -254,7 +265,7 @@
 </div>
 
 <div id="page2" class="page">
-  <button class="btn" style="font-size: 26px; padding: 25px;" onclick="startGame()">GAME START</button>
+  <button class="btn" style="font-size: 26px; padding: 25px; background-color: rgba(0, 123, 255, 0.9);" onclick="startGame()">GAME START</button>
 </div>
 
 <div id="page3" class="page">
@@ -288,8 +299,13 @@
     <p>「 長月 ・ 皐月 ・ 師走 」 ＝ ？？？</p>
   </div>
 
+  <!-- 第1ヒント -->
   <button class="btn" id="hint-btn" onclick="showHint()" disabled>ヒント：あと03:00で解放</button>
   <div id="hint-text"></div>
+
+  <!-- Hard専用：第2ヒント -->
+  <button class="btn" id="hint2-btn" onclick="showHint2()" style="display:none;" disabled>第2ヒント：あと02:00で解放</button>
+  <div id="hint2-text"></div>
   
   <div class="answer-inputs">
     <select id="ans1"></select>
@@ -360,7 +376,7 @@
 </div>
 
 <script>
-// ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+  // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
   // ▼▼ 時間の設定（ここを変えると制限時間やヒントの時間が変わります） ▼▼
   // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
   
@@ -369,10 +385,15 @@
   const TIME_LIMIT_SEC = 0; // 秒
   const TIME_LIMIT_MS  = 0; // コンマ秒（ミリ秒）
   
-  // 【ヒントが解放されるまでの残り時間】
+  // 【第1ヒントが解放される時間】
   const HINT_TIME_MIN = 4; // 分
   const HINT_TIME_SEC = 30; // 秒
   const HINT_TIME_MS  = 0; // コンマ秒（ミリ秒）
+
+  // 【第2ヒントが解放される時間】
+  const HINT2_TIME_MIN = 3; // 分
+  const HINT2_TIME_SEC = 0; // 秒
+  const HINT2_TIME_MS  = 0; // コンマ秒（ミリ秒）
   
   // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
   // ▲▲ 設定ここまで ▲▲
@@ -381,11 +402,12 @@
   let difficulty = 'easy';
   let totalTimeMs = (TIME_LIMIT_MIN * 60 * 1000) + (TIME_LIMIT_SEC * 1000) + TIME_LIMIT_MS;
   let hintTimeMs = (HINT_TIME_MIN * 60 * 1000) + (HINT_TIME_SEC * 1000) + HINT_TIME_MS;
+  let hint2TimeMs = (HINT2_TIME_MIN * 60 * 1000) + (HINT2_TIME_SEC * 1000) + HINT2_TIME_MS;
+  
   let timerInterval;
   let endTime;
   let timeLeftMs;
 
-  // カウントアップ用の変数
   let countUpInterval;
   let countUpStartTime;
   let countUpMs = 0;
@@ -422,16 +444,19 @@
   function goToPage2() {
     difficulty = document.querySelector('input[name="difficulty"]:checked').value;
     
+    const hint2Btn = document.getElementById('hint2-btn');
     if(difficulty === 'easy') {
       document.getElementById('q-easy').style.display = 'block';
       document.getElementById('q-hard').style.display = 'none';
       document.getElementById('exp-easy').style.display = 'block';
       document.getElementById('exp-hard').style.display = 'none';
+      if(hint2Btn) hint2Btn.style.display = 'none'; // Easyなら第2ヒントボタンを隠す
     } else {
       document.getElementById('q-easy').style.display = 'none';
       document.getElementById('q-hard').style.display = 'block';
       document.getElementById('exp-easy').style.display = 'none';
       document.getElementById('exp-hard').style.display = 'block';
+      if(hint2Btn) hint2Btn.style.display = 'block'; // Hardなら第2ヒントボタンを表示
     }
     
     showPage('page2');
@@ -459,6 +484,7 @@
     
     formatAndDisplayTime(timeLeftMs);
     
+    // 第1ヒントのカウントダウン処理
     const hintBtn = document.getElementById('hint-btn');
     if (hintBtn) {
       if(timeLeftMs <= hintTimeMs) {
@@ -471,6 +497,24 @@
         let waitSec = (waitTotalSec % 60).toString().padStart(2, '0');
         
         hintBtn.textContent = `ヒント：あと${waitMin}:${waitSec}で解放`;
+      }
+    }
+
+    // Hardモードのときの第2ヒントのカウントダウン処理
+    if (difficulty === 'hard') {
+      const hint2Btn = document.getElementById('hint2-btn');
+      if (hint2Btn) {
+        if(timeLeftMs <= hint2TimeMs) {
+          hint2Btn.disabled = false;
+          hint2Btn.textContent = "第2ヒントを見る";
+        } else {
+          let waitTimeMs2 = timeLeftMs - hint2TimeMs;
+          let waitTotalSec2 = Math.floor(waitTimeMs2 / 1000);
+          let waitMin2 = Math.floor(waitTotalSec2 / 60).toString().padStart(2, '0');
+          let waitSec2 = (waitTotalSec2 % 60).toString().padStart(2, '0');
+          
+          hint2Btn.textContent = `第2ヒント：あと${waitMin2}:${waitSec2}で解放`;
+        }
       }
     }
   }
@@ -490,7 +534,6 @@
     return timeString;
   }
 
-  // カウントアップ用の時間フォーマット関数
   function formatAndDisplayCountUp(ms) {
     let totalSeconds = Math.floor(ms / 1000);
     let minutes = Math.floor(totalSeconds / 60);
@@ -515,6 +558,14 @@
     }
     hintText.style.display = 'block';
     document.getElementById('hint-btn').style.display = 'none';
+  }
+
+  // 第2ヒントを表示する関数
+  function showHint2() {
+    const hint2Text = document.getElementById('hint2-text');
+    hint2Text.textContent = "長月は9月、皐月は5月、師走は12月だよ！";
+    hint2Text.style.display = 'block';
+    document.getElementById('hint2-btn').style.display = 'none';
   }
 
   function checkAnswer() {
@@ -563,19 +614,15 @@
     }, 10);
   }
 
-// 【タイムアップ後のページ5での合言葉判定】
   function checkTimeoutFinal() {
     let keyword = document.getElementById('timeout-keyword').value;
     keyword = keyword.replace(/\s+/g, "");
     
     if(keyword === "ミッションクリア") {
-      clearInterval(countUpInterval); // カウントアップを止める
+      clearInterval(countUpInterval);
       document.getElementById('timer-container').style.display = 'none';
-      
-      // 赤フィルターを消す
       document.getElementById('red-filter').style.display = 'none';
       
-      // ★ ここで設定した制限時間（分・秒）の数字を自動で合体させる！
       let limitText = `${TIME_LIMIT_MIN}分`;
       if (TIME_LIMIT_SEC > 0) {
         limitText += `${TIME_LIMIT_SEC}秒`;
@@ -583,8 +630,6 @@
       
       const extraTimeStr = formatAndDisplayCountUp(countUpMs);
       document.getElementById('clear-time').textContent = `${limitText} ＋ ${extraTimeStr}`;
-      
-      // タイトルを「ナイストライ！」に変更
       document.getElementById('clear-title').textContent = "ナイストライ！";
       
       showPage('page6');
