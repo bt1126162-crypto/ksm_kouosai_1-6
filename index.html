@@ -8,99 +8,145 @@
 
 <meta charset="UTF-8">
 
-<style>
-.koukousai-title {
-    font-family: "Yuji Syuku", serif;
-    font-size: 60px;
-}
-</style>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>香煌祭ミッション</title>
 <style>
-  /* 基本デザイン */
-  body {
+  * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-    touch-action: manipulation; /* ダブルタップズーム防止 */
   }
-  
-  /* 画面上部に固定されるタイマー（ページ3、4、5で使用） */
+
+  /* 基本デザイン：サイバー＆ダークテーマ */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0b0f19 0%, #1a0b2e 100%);
+    color: #e2e8f0;
+    touch-action: manipulation;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* レーザーラインを表現する背景アニメーション */
+  .laser-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .laser-beam {
+    position: absolute;
+    width: 2px;
+    height: 200px;
+    background: linear-gradient(to bottom, transparent, #00ffcc, transparent);
+    animation: moveLaser 3s infinite linear;
+  }
+
+  .laser-beam:nth-child(1) { left: 20%; animation-duration: 2.2s; animation-delay: 0s; }
+  .laser-beam:nth-child(2) { left: 50%; animation-duration: 1.5s; animation-delay: 0.7s; }
+  .laser-beam:nth-child(3) { left: 80%; animation-duration: 2.8s; animation-delay: 1.2s; }
+  .laser-beam:nth-child(4) { left: 35%; animation-duration: 1.8s; animation-delay: 0.4s; }
+
+  @keyframes moveLaser {
+    0% { transform: translateY(-200px); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+  }
+
+  /* 画面上部に固定されるタイマー */
   #timer-container {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #222;
-    color: #fff;
+    background-color: rgba(15, 23, 42, 0.95);
+    color: #00ffcc;
     text-align: center;
-    padding: 10px 0;
+    padding: 12px 0;
     font-size: 24px;
     font-weight: bold;
     z-index: 1000;
     letter-spacing: 2px;
+    border-bottom: 1px solid rgba(0, 255, 204, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
   }
 
   /* ページの表示切り替え用クラス */
   .page {
     display: none;
     min-height: 100vh;
-    padding: 20px;
+    padding: 30px 20px;
     box-sizing: border-box;
-    padding-top: 70px; /* 上部タイマーに隠れないようにするための余白 */
+    padding-top: 70px;
     flex-direction: column;
     align-items: center;
-    background-color: #fff;
+    position: relative;
+    z-index: 1;
   }
-  /* ページが表示状態のとき */
   .page.active {
     display: flex;
   }
   
   /* タイマーが出ないページは中央寄せに調整 */
-  #page1, #page6 {
+  #page1, #page2, #page6 {
     justify-content: center;
-    padding-top: 20px;
+    padding-top: 30px;
   }
 
-  /* ページ2（GAME START画面）専用：背景画像(.png) ＋ 白の半透明フィルター */
-  #page2 {
-    justify-content: center;
-    padding-top: 20px;
-    background-image: 
-      linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), 
-      url('文化祭ポスター レーザートラップステルス.png');
-    background-size: cover;
-    background-position: center;
+  /* タイトルデザイン */
+  .koukousai-title {
+    font-family: "Yuji Syuku", serif;
+    font-size: 50px;
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+    margin-bottom: 10px;
+    text-align: center;
   }
 
-  /* UIパーツのデザイン */
-  h1 { font-size: 22px; text-align: center; margin-bottom: 20px; }
+  h1 { 
+    font-size: 20px; 
+    text-align: center; 
+    margin-bottom: 20px; 
+    color: #94a3b8;
+    letter-spacing: 1px;
+  }
   
+  /* ネオン風ボタン */
   .btn {
     display: block;
     width: 85%;
     max-width: 320px;
     padding: 15px;
     margin: 20px auto;
-    background-color: #007BFF;
-    color: #fff;
+    background: linear-gradient(45deg, #00ffcc, #0077ff);
+    color: #0b0f19;
     border: none;
     border-radius: 8px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     text-align: center;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+    transition: all 0.2s ease;
+  }
+  .btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 25px rgba(0, 255, 204, 0.8);
   }
   .btn:disabled {
-    background-color: #ccc;
+    background: #334155;
     box-shadow: none;
-    color: #666;
+    color: #64748b;
+    cursor: not-allowed;
+    transform: none;
   }
   
   .form-group {
@@ -108,14 +154,22 @@
     max-width: 300px;
     margin: 15px 0;
   }
-  label { font-weight: bold; display: block; margin-bottom: 8px; }
+  label { font-weight: bold; display: block; margin-bottom: 8px; color: #00ffcc; font-size: 14px; }
+  
   select, input[type="text"] {
     width: 100%;
     padding: 12px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(0, 255, 204, 0.3);
+    color: #fff;
+    border-radius: 8px;
     box-sizing: border-box;
+  }
+  select:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: #00ffcc;
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
   }
   
   .radio-group {
@@ -123,12 +177,12 @@
     justify-content: space-around;
     margin-top: 10px;
   }
-  .radio-group label { font-weight: normal; font-size: 18px; display: flex; align-items: center; gap: 5px;}
+  .radio-group label { font-weight: normal; font-size: 16px; display: flex; align-items: center; gap: 5px; color: #fff; cursor: pointer; }
 
   /* はんこ風のMISSIONテキスト */
   .stamp {
-    color: #D32F2F;
-    border: 4px solid #D32F2F;
+    color: #ff3366;
+    border: 4px solid #ff3366;
     border-radius: 8px;
     padding: 10px 25px;
     font-size: 30px;
@@ -136,20 +190,25 @@
     letter-spacing: 4px;
     transform: rotate(-5deg);
     display: inline-block;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     font-family: 'Times New Roman', serif;
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+    background: rgba(15, 23, 42, 0.6);
   }
 
   /* 問題文エリア */
   .question-box {
-    background: #f9f9f9;
-    border-left: 5px solid #007BFF;
-    padding: 15px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(0, 255, 204, 0.3);
+    border-left: 5px solid #00ffcc;
+    padding: 20px;
     width: 100%;
     max-width: 350px;
     margin-bottom: 20px;
     line-height: 1.6;
-    font-size: 15px;
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   }
 
   /* 3桁の回答入力エリア */
@@ -165,35 +224,39 @@
     font-size: 24px;
     text-align: center;
     padding: 0;
+    background: rgba(15, 23, 42, 0.9);
   }
   
   /* ヒント表示 */
   #hint-text, #hint2-text {
     display: none;
-    color: #E65100;
+    color: #ffaa00;
     font-weight: bold;
-    background: #FFF3E0;
+    background: rgba(45, 30, 10, 0.9);
+    border: 1px solid rgba(255, 170, 0, 0.4);
     padding: 15px;
-    border-radius: 4px;
+    border-radius: 8px;
     margin-bottom: 20px;
     width: 100%;
     max-width: 350px;
     text-align: center;
+    box-shadow: 0 0 10px rgba(255, 170, 0, 0.2);
   }
 
   /* 六角形マーク */
   .hexagon {
-    width: 120px;
-    height: 138px;
-    background-color: #FFC107;
+    width: 100px;
+    height: 115px;
+    background: linear-gradient(135deg, #ffaa00, #ff5500);
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     margin: 20px auto;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-size: 40px;
+    font-size: 36px;
     font-weight: bold;
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.5);
   }
 
   /* ページ5の赤い透明フィルター */
@@ -201,42 +264,67 @@
     display: none;
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(255, 0, 0, 0.3);
+    background-color: rgba(255, 0, 0, 0.25);
     pointer-events: none;
     z-index: 9999;
   }
   
   .mission-failed {
-    color: #D32F2F;
-    font-size: 38px;
+    color: #ff3366;
+    font-size: 34px;
     font-weight: bold;
     margin-bottom: 10px;
+    text-shadow: 0 0 10px rgba(255, 51, 102, 0.6);
   }
 
   /* 解説エリア */
   .explanation-box {
-    background: #fff;
-    border: 1px solid #ccc;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 15px;
     width: 100%;
     max-width: 350px;
     margin-top: 20px;
     line-height: 1.6;
-    font-size: 14px;
+    font-size: 13px;
     text-align: left;
-    border-radius: 5px;
+    border-radius: 8px;
+    color: #cbd5e1;
   }
 
   /* ページ6 クリア画面 */
   .clear-text {
-    color: #388E3C;
-    font-size: 44px;
+    color: #00ffcc;
+    font-size: 40px;
     font-weight: bold;
     margin-bottom: 15px;
+    text-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+  }
+  
+  /* コンテナボックス共通（ページ1、5など） */
+  .cyber-box {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(0, 255, 204, 0.2);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 </style>
 </head>
 <body>
+
+<!-- レーザー背景のエフェクト -->
+<div class="laser-bg">
+    <div class="laser-beam"></div>
+    <div class="laser-beam"></div>
+    <div class="laser-beam"></div>
+    <div class="laser-beam"></div>
+</div>
 
 <div id="timer-container">
   <span id="timer-display">00:00:00</span>
@@ -244,43 +332,52 @@
 
 <div id="red-filter"></div>
 
+<!-- ページ1：プレイヤー設定 -->
 <div id="page1" class="page active">
-  <h1 class="koukousai-title">香煌祭</h1>
-  <h1>プレイヤー設定</h1>
-  
-  <div class="form-group">
-    <label for="age">年齢</label>
-    <select id="age"></select>
-  </div>
-  
-  <div class="form-group">
-    <label>難易度選択</label>
-    <div class="radio-group">
-      <label><input type="radio" name="difficulty" value="easy" checked> Easy</label>
-      <label><input type="radio" name="difficulty" value="hard"> Hard</label>
+  <div class="cyber-box">
+    <h1 class="koukousai-title">香煌祭</h1>
+    <h1>プレイヤー設定</h1>
+    
+    <div class="form-group">
+      <label for="age">年齢</label>
+      <select id="age"></select>
     </div>
+    
+    <div class="form-group">
+      <label>難易度選択</label>
+      <div class="radio-group">
+        <label><input type="radio" name="difficulty" value="easy" checked> Easy</label>
+        <label><input type="radio" name="difficulty" value="hard"> Hard</label>
+      </div>
+    </div>
+    
+    <button class="btn" onclick="goToPage2()">上の内容で確定</button>
   </div>
-  
-  <button class="btn" onclick="goToPage2()">上の内容で確定</button>
 </div>
 
-<div id="page2" class="page">
-  <button class="btn" style="font-size: 26px; padding: 25px; background-color: rgba(0, 123, 255, 0.9);" onclick="startGame()">GAME START</button>
+<!-- ページ2：スタート画面（ご提示いただいたポスター画像を背景にする場合はここに適用されます） -->
+<div id="page2" class="page" style="background: linear-gradient(135deg, #0b0f19 0%, #1a0b2e 100%);">
+  <div class="cyber-box" style="text-align: center;">
+    <h1 style="color: #fff; font-size: 24px; margin-bottom: 5px;">Laser Trap Stealth</h1>
+    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 25px;">準備はいいか？ミッションをクリアせよ</p>
+    <button class="btn" style="font-size: 18px; padding: 15px;" onclick="startGame()">GAME START</button>
+  </div>
 </div>
 
+<!-- ページ3：問題画面 -->
 <div id="page3" class="page">
   <div class="stamp">MISSION</div>
   
   <div class="question-box" id="q-easy">
     <p>以下の法則で、3つの数字のグループが別の数字に変身しています。</p>
-    <p>
+    <p style="margin: 10px 0; font-family: monospace; color: #00ffcc;">
       1 3 7 ＝ 0<br>
       6 1 2 ＝ 1<br>
       9 0 8 ＝ 4<br>
       8 8 6 ＝ 5
     </p>
     <p>では、次のA、B、Cを解いて、出た数字を左から順番に並べた「3桁の数字」を並べて暗証番号を解読せよ。</p>
-    <p>
+    <p style="margin-top: 10px; font-family: monospace; color: #00ffcc;">
       A： 8 0 6 ＝ ？<br>
       B： 5 9 0 ＝ ？<br>
       C： 8 8 8 ＝ ？
@@ -289,22 +386,22 @@
   
   <div class="question-box" id="q-hard" style="display:none;">
     <p>以下の法則で和風月名（旧暦の月）が数字に変換されています。</p>
-    <p>
+    <p style="margin: 10px 0; font-family: monospace; color: #00ffcc;">
       睦月 ＝ 7<br>
       如月 ＝ 8<br>
       弥生 ＝ 5<br>
       卯月 ＝ 5
     </p>
     <p>では、この法則に従い、以下の3つの月が表す「3桁の数字」をもとに暗証番号を導け？</p>
-    <p>「 長月 ・ 皐月 ・ 師走 」 ＝ ？？？</p>
+    <p style="margin-top: 10px; font-family: monospace; color: #00ffcc;">「 長月 ・ 皐月 ・ 師走 」 ＝ ？？？</p>
   </div>
 
   <!-- 第1ヒント -->
-  <button class="btn" id="hint-btn" onclick="showHint()" disabled>ヒント：あと03:00で解放</button>
+  <button class="btn" id="hint-btn" onclick="showHint()" disabled style="background: #334155; color: #cbd5e1;">ヒント：あと03:00で解放</button>
   <div id="hint-text"></div>
 
   <!-- Hard専用：第2ヒント -->
-  <button class="btn" id="hint2-btn" onclick="showHint2()" style="display:none;" disabled>第2ヒント：あと02:00で解放</button>
+  <button class="btn" id="hint2-btn" onclick="showHint2()" style="display:none; background: #334155; color: #cbd5e1;" disabled>第2ヒント：あと02:00で解放</button>
   <div id="hint2-text"></div>
   
   <div class="answer-inputs">
@@ -316,63 +413,71 @@
   <button class="btn" onclick="checkAnswer()">解答する</button>
 </div>
 
-<div id="page4" class="page">
-  <div class="hexagon">★</div>
-  
-  <div class="form-group" style="margin-top: 20px;">
-    <input type="text" id="final-keyword" placeholder="スタッフに画面を見せる">
-  </div>
-  
-  <button class="btn" onclick="checkFinal()">送信</button>
-</div>
-
-<div id="page5" class="page">
-  <div class="mission-failed">MISSION失敗</div>
-  <p style="font-weight: bold; font-size: 18px; margin-bottom: 10px;">ゴールまでは行ってみてね</p>
-  
-  <div class="hexagon">★</div>
-  <div class="form-group" style="margin-top: 10px;">
-    <input type="text" id="timeout-keyword" placeholder="スタッフに画面を見せる">
-  </div>
-  <button class="btn" onclick="checkTimeoutFinal()">送信</button>
-
-  <div class="explanation-box" id="exp-easy">
-    <strong>【解説】</strong><br><br>
-    注目すべきは、「数字の中に丸（○）のような囲まれた空間がいくつあるか」です。<br><br>
-    「1, 2, 3, 5, 7」には丸がありません（0個）<br>
-    「0, 6, 9」には丸が1つあります（1個）<br>
-    「8」には丸が上に1つ、下に1つあります（2個）<br><br>
-    この法則で例題を見てみると……<br>
-    1 3 7 ＝ 丸はないので「0」<br>
-    6 1 2 ＝ 6に丸が1つあるので「1」<br>
-    9 0 8 ＝ 9(1個)＋0(1個)＋8(2個) ＝ 「4」<br>
-    8 8 6 ＝ 8(2個)＋8(2個)＋6(1個) ＝ 「5」<br><br>
-    問題のA・B・Cを解いてみます。<br>
-    A：8 0 6 ＝ 8(2個)＋0(1個)＋6(1個) ＝ 4<br>
-    B：5 9 0 ＝ 5(0個)＋9(1個)＋0(1個) ＝ 2<br>
-    C：8 8 8 ＝ 8(2個)＋8(2個)＋8(2個) ＝ 6<br><br>
-    出た数字を左から並べると、導き出される3桁の数字は「426」になります。
-  </div>
-
-  <div class="explanation-box" id="exp-hard" style="display:none;">
-    <strong>【解説】</strong><br><br>
-    月を「英語（アルファベット）」に変換し、その文字数を数えるのが正解です。<br><br>
-    睦月（1月）＝ JANUARY （7文字）<br>
-    如月（2月）＝ FEBRUARY （8文字）<br>
-    弥生（3月）＝ MARCH （5文字）<br>
-    卯月（4月）＝ APRIL （5文字）<br><br>
-    問題の3つの月をこれに当てはめると……<br>
-    長月（9月）＝ SEPTEMBER （9文字）<br>
-    皐月（5月）＝ MAY （3文字）<br>
-    師走（12月）＝ DECEMBER （8文字）<br><br>
-    よって、導き出される3桁の数字は「938」となります。
+<!-- ページ4：最終コード入力画面 -->
+<div id="page4" class="page" style="justify-content: center;">
+  <div class="cyber-box">
+    <div class="hexagon">★</div>
+    <p style="color: #94a3b8; font-size: 14px; margin-bottom: 10px;">暗証番号が解読された</p>
+    <div class="form-group" style="margin-top: 10px;">
+      <input type="text" id="final-keyword" placeholder="スタッフに画面を見せる">
+    </div>
+    <button class="btn" onclick="checkFinal()">送信</button>
   </div>
 </div>
 
-<div id="page6" class="page">
-  <h1 id="clear-title" class="clear-text">クリア</h1>
-  <p style="font-size: 18px; margin-bottom: 5px;">かかった時間</p>
-  <div id="clear-time" style="font-size: 36px; font-weight: bold; color: #333;"></div>
+<!-- ページ5：タイムアップ / ミッション失敗画面 -->
+<div id="page5" class="page" style="justify-content: center;">
+  <div class="cyber-box" style="border-color: rgba(255, 51, 102, 0.4); box-shadow: 0 0 20px rgba(255, 51, 102, 0.2);">
+    <div class="mission-failed">MISSION失敗</div>
+    <p style="font-weight: bold; font-size: 16px; margin-bottom: 15px; color: #fff;">ゴールまでは行ってみてね</p>
+    
+    <div class="hexagon" style="background: linear-gradient(135deg, #ff3366, #990033); box-shadow: 0 0 20px rgba(255, 51, 102, 0.5);">★</div>
+    <div class="form-group" style="margin-top: 10px;">
+      <input type="text" id="timeout-keyword" placeholder="スタッフに画面を見せる">
+    </div>
+    <button class="btn" onclick="checkTimeoutFinal()" style="background: linear-gradient(45deg, #ff3366, #ff0055); color: #fff;">送信</button>
+
+    <div class="explanation-box" id="exp-easy">
+      <strong style="color: #00ffcc;">【解説】</strong><br><br>
+      注目すべきは、「数字の中に丸（○）のような囲まれた空間がいくつあるか」です。<br><br>
+      「1, 2, 3, 5, 7」には丸がありません（0個）<br>
+      「0, 6, 9」には丸が1つあります（1個）<br>
+      「8」には丸が上に1つ、下に1つあります（2個）<br><br>
+      この法則で例題を見てみると……<br>
+      1 3 7 ＝ 丸はないので「0」<br>
+      6 1 2 ＝ 6に丸が1つあるので「1」<br>
+      9 0 8 ＝ 9(1個)＋0(1個)＋8(2個) ＝ 「4」<br>
+      8 8 6 ＝ 8(2個)＋8(2個)＋6(1個) ＝ 「5」<br><br>
+      問題のA・B・Cを解いてみます。<br>
+      A：8 0 6 ＝ 8(2個)＋0(1個)＋6(1個) ＝ 4<br>
+      B：5 9 0 ＝ 5(0個)＋9(1個)＋0(1個) ＝ 2<br>
+      C：8 8 8 ＝ 8(2個)＋8(2個)＋8(2個) ＝ 6<br><br>
+      出た数字を左から並べると、導き出される3桁の数字は「426」になります。
+    </div>
+
+    <div class="explanation-box" id="exp-hard" style="display:none;">
+      <strong style="color: #00ffcc;">【解説】</strong><br><br>
+      月を「英語（アルファベット）」に変換し、その文字数を数えるのが正解です。<br><br>
+      睦月（1月）＝ JANUARY （7文字）<br>
+      如月（2月）＝ FEBRUARY （8文字）<br>
+      弥生（3月）＝ MARCH （5文字）<br>
+      卯月（4月）＝ APRIL （5文字）<br><br>
+      問題の3つの月をこれに当てはめると……<br>
+      長月（9月）＝ SEPTEMBER （9文字）<br>
+      皐月（5月）＝ MAY （3文字）<br>
+      師走（12月）＝ DECEMBER （8文字）<br><br>
+      よって、導き出される3桁の数字は「938」となります。
+    </div>
+  </div>
+</div>
+
+<!-- ページ6：クリア画面 -->
+<div id="page6" class="page" style="justify-content: center;">
+  <div class="cyber-box">
+    <h1 id="clear-title" class="clear-text">クリア</h1>
+    <p style="font-size: 14px; margin-bottom: 5px; color: #94a3b8;">かかった時間</p>
+    <div id="clear-time" style="font-size: 32px; font-weight: bold; color: #00ffcc; text-shadow: 0 0 10px rgba(0, 255, 204, 0.4);"></div>
+  </div>
 </div>
 
 <script>
@@ -380,17 +485,14 @@
   // ▼▼ 時間の設定（ここを変えると制限時間やヒントの時間が変わります） ▼▼
   // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
   
-  // 【全体の制限時間】
   const TIME_LIMIT_MIN = 7; // 分
   const TIME_LIMIT_SEC = 0; // 秒
   const TIME_LIMIT_MS  = 0; // コンマ秒（ミリ秒）
   
-  // 【第1ヒントが解放される時間】
   const HINT_TIME_MIN = 4; // 分
   const HINT_TIME_SEC = 30; // 秒
   const HINT_TIME_MS  = 0; // コンマ秒（ミリ秒）
 
-  // 【第2ヒントが解放される時間】
   const HINT2_TIME_MIN = 3; // 分
   const HINT2_TIME_SEC = 0; // 秒
   const HINT2_TIME_MS  = 0; // コンマ秒（ミリ秒）
@@ -450,13 +552,13 @@
       document.getElementById('q-hard').style.display = 'none';
       document.getElementById('exp-easy').style.display = 'block';
       document.getElementById('exp-hard').style.display = 'none';
-      if(hint2Btn) hint2Btn.style.display = 'none'; // Easyなら第2ヒントボタンを隠す
+      if(hint2Btn) hint2Btn.style.display = 'none';
     } else {
       document.getElementById('q-easy').style.display = 'none';
       document.getElementById('q-hard').style.display = 'block';
       document.getElementById('exp-easy').style.display = 'none';
       document.getElementById('exp-hard').style.display = 'block';
-      if(hint2Btn) hint2Btn.style.display = 'block'; // Hardなら第2ヒントボタンを表示
+      if(hint2Btn) hint2Btn.style.display = 'block';
     }
     
     showPage('page2');
@@ -484,12 +586,13 @@
     
     formatAndDisplayTime(timeLeftMs);
     
-    // 第1ヒントのカウントダウン処理
     const hintBtn = document.getElementById('hint-btn');
     if (hintBtn) {
       if(timeLeftMs <= hintTimeMs) {
         hintBtn.disabled = false;
         hintBtn.textContent = "ヒントを見る";
+        hintBtn.style.background = "linear-gradient(45deg, #ffaa00, #ff5500)";
+        hintBtn.style.color = "#fff";
       } else {
         let waitTimeMs = timeLeftMs - hintTimeMs;
         let waitTotalSec = Math.floor(waitTimeMs / 1000);
@@ -500,13 +603,14 @@
       }
     }
 
-    // Hardモードのときの第2ヒントのカウントダウン処理
     if (difficulty === 'hard') {
       const hint2Btn = document.getElementById('hint2-btn');
       if (hint2Btn) {
         if(timeLeftMs <= hint2TimeMs) {
           hint2Btn.disabled = false;
           hint2Btn.textContent = "第2ヒントを見る";
+          hint2Btn.style.background = "linear-gradient(45deg, #ffaa00, #ff5500)";
+          hint2Btn.style.color = "#fff";
         } else {
           let waitTimeMs2 = timeLeftMs - hint2TimeMs;
           let waitTotalSec2 = Math.floor(waitTimeMs2 / 1000);
@@ -560,7 +664,6 @@
     document.getElementById('hint-btn').style.display = 'none';
   }
 
-  // 第2ヒントを表示する関数
   function showHint2() {
     const hint2Text = document.getElementById('hint2-text');
     hint2Text.textContent = "長月は9月、皐月は5月、師走は12月だよ！";
