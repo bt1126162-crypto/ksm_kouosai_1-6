@@ -259,14 +259,23 @@
     box-shadow: 0 0 20px rgba(255, 170, 0, 0.5);
   }
 
-  /* ページ5の赤い透明フィルター */
+  /* 赤い透明フィルター ＋ 点滅用のアニメーション設定 */
   #red-filter {
     display: none;
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(255, 0, 0, 0.25);
+    background-color: rgba(255, 0, 0, 0.15);
     pointer-events: none;
     z-index: 9999;
+  }
+  
+  .flashing {
+    animation: flashRed 1s infinite alternate;
+  }
+
+  @keyframes flashRed {
+    0% { background-color: rgba(255, 0, 0, 0.05); }
+    100% { background-color: rgba(255, 0, 0, 0.2); }
   }
   
   .mission-failed {
@@ -301,7 +310,7 @@
     text-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
   }
   
-  /* コンテナボックス共通（ページ1、5など） */
+  /* コンテナボックス共通 */
   .cyber-box {
     background: rgba(15, 23, 42, 0.8);
     border: 1px solid rgba(0, 255, 204, 0.2);
@@ -355,7 +364,7 @@
   </div>
 </div>
 
-<!-- ページ2：スタート画面（ご提示いただいたポスター画像を背景にする場合はここに適用されます） -->
+<!-- ページ2：スタート画面 -->
 <div id="page2" class="page" style="background: linear-gradient(135deg, #0b0f19 0%, #1a0b2e 100%);">
   <div class="cyber-box" style="text-align: center;">
     <h1 style="color: #fff; font-size: 24px; margin-bottom: 5px;">Laser Trap Stealth</h1>
@@ -482,7 +491,7 @@
 
 <script>
   // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-  // ▼▼ 時間の設定（ここを変えると制限時間やヒントの時間が変わります） ▼▼
+  // ▼▼ 時間の設定 ▼▼
   // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
   
   const TIME_LIMIT_MIN = 7; // 分
@@ -585,6 +594,16 @@
     }
     
     formatAndDisplayTime(timeLeftMs);
+
+    // 残り30秒未満のとき、うっすら赤く点滅
+    const redFilter = document.getElementById('red-filter');
+    if (timeLeftMs <= 30000) {
+      redFilter.style.display = 'block';
+      redFilter.classList.add('flashing');
+    } else {
+      redFilter.style.display = 'none';
+      redFilter.classList.remove('flashing');
+    }
     
     const hintBtn = document.getElementById('hint-btn');
     if (hintBtn) {
@@ -692,7 +711,12 @@
     keyword = keyword.replace(/\s+/g, "");
     
     if(keyword === "ミッションクリア") {
+      // ★ゲームクリア！タイマーを完全に止めて、赤フィルター＆点滅も強制消去する！
       clearInterval(timerInterval);
+      const redFilter = document.getElementById('red-filter');
+      redFilter.classList.remove('flashing');
+      redFilter.style.display = 'none';
+      
       document.getElementById('timer-container').style.display = 'none';
       
       const stoppedTime = formatAndDisplayTime(totalTimeMs - timeLeftMs);
@@ -707,7 +731,13 @@
 
   function missionFailed() {
     document.getElementById('timer-container').style.display = 'block';
-    document.getElementById('red-filter').style.display = 'block';
+    
+    // タイムアップ時は点滅を外し、はっきりとした赤フィルターを固定表示
+    const redFilter = document.getElementById('red-filter');
+    redFilter.classList.remove('flashing');
+    redFilter.style.display = 'block';
+    redFilter.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+
     showPage('page5');
 
     countUpStartTime = Date.now();
@@ -722,6 +752,7 @@
     keyword = keyword.replace(/\s+/g, "");
     
     if(keyword === "ミッションクリア") {
+      // ★タイムアップ後のクリア時も、カウントアップを止めて赤フィルターを消す！
       clearInterval(countUpInterval);
       document.getElementById('timer-container').style.display = 'none';
       document.getElementById('red-filter').style.display = 'none';
